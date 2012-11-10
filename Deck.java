@@ -8,7 +8,7 @@ public class Deck
 	public Deck(Card[] deck)
 	{
 		d = deck;
-		index = 0;
+		index = -1;
 	}
 
 	
