@@ -17,7 +17,8 @@ public class Blackjack{
 		Card blank=new Card(0,0);
 		int n=0;
 		int winner=0;
-		int numPlayers=0;
+		int nPlayers=0;
+		int nDecks=0;
 		Card[] cards=null;
 		Deck shoe=null;
 		char sel=0;
@@ -28,47 +29,52 @@ public class Blackjack{
 		System.out.print("E");
 		do{
 			System.out.print("nter number of players: ");
-			numPlayers=IO.readInt();
-			if(numPlayers<1){
+			nPlayers=IO.readInt();
+			if(nPlayers<1){
 				System.out.println("Number of players must be larger than 0.");
 				System.out.print("Re-e");
 			}
-		}while(numPlayers<1);
+		}while(nPlayers<1);
+		//Setup array of players
+		//n+1 rows for n players and a dea
+		players=new Card[nPlayers+1][MAX_CARDS];
 		//Get number of decks
 		System.out.print("E");
 		do{
 			System.out.print("nter number of decks: ");
-			n=IO.readInt();
-			if(n<1){
+			nDecks=IO.readInt();
+			if(nDecks<1){
 				System.out.println("Number of decks must be larger than 0");
 				System.out.print("Re-e");
 			}
-		}while(n<1);
-		cards=makeCardArr(n);
+		}while(nDecks<1);
+		cards=makeCardArr(nDecks);
 		do{
-			do{
-				if(lastHand==true){
-					System.out.println("Shuffling decks...");
-					shuffle(cards);
-					shoe=new Deck(cards);
-					lastHand=false;
+			System.out.println();
+			if(lastHand==true || nDecks==1){
+				System.out.printf("Shuffling deck%s...\n",nDecks==1?"":"s");
+				shuffle(cards);
+				shoe=new Deck(cards);
+				lastHand=false;
+			}
+			//Fill the players[][] array with blank Cards
+			for(int i=0;i<players.length;++i)
+				Arrays.fill(players[i],blank);
+			System.out.println("Dealing...");
+			for(int j=0;j<2;++j){
+				for(int i=0;i<players.length && !shoe.isEmpty();++i){
+					players[i][j]=shoe.deal();
+					if(players[i][j].getFace()==Card.CUT_CARD){
+						System.out.println("\nCUT CARD DRAWN. LAST HAND\n");
+						players[i][j]=shoe.deal();
+						lastHand=true;
+					}
 				}
-				//Setup array of players
-				//n+1 rows for n players and a dea
-				players=new Card[numPlayers+1][MAX_CARDS];
-				//Fill the players array with blank Cards
-				for(int i=0;i<players.length;++i)
-					Arrays.fill(players[i],blank);
-				System.out.println("Dealing...");
-				for(int i=0;i<players.length && !shoe.isEmpty();++i)
-					players[i][0]=shoe.deal();
-				for(int i=0;i<players.length && !shoe.isEmpty();++i)
-					players[i][1]=shoe.deal();
-				if(shoe.isEmpty()){
-					System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
-					lastHand=true;
-				}
-			}while(lastHand==true);
+			}
+			if(shoe.isEmpty()){
+				System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
+				lastHand=true;
+			}
 			//main game loop
 			//Start with index 1, because the dealer (0) goes last
 			for(int i=1;i<players.length;++i){
@@ -82,7 +88,7 @@ public class Blackjack{
 						case 'H':
 							players[i][n++]=shoe.deal();
 							if(players[i][n].getFace()==Card.CUT_CARD){
-								System.out.println("CUT CARD DRAWN. SHUFFLING NEXT HAND.");
+								System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
 								lastHand=true;
 								players[i][n]=shoe.deal();
 							}
@@ -101,9 +107,15 @@ public class Blackjack{
 				}
 			}
 			dispTable(players,false);
-			System.out.println("Dealing to dealer... (He stands at 17)");
-			for(int i=2;handTotal(players[0])<17 && i<MAX_CARDS;++i)
+			System.out.println("Dealing to dealer... (He stands on all 17s)");
+			for(int i=2;handTotal(players[0])<17 && i<MAX_CARDS;++i){
 				players[0][i]=shoe.deal();
+				if(players[0][i].getFace()==Card.CUT_CARD){
+					System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
+					lastHand=true;
+					players[0][i]=shoe.deal();
+				}
+			}
 			System.out.println("FINAL:");
 			dispTable(players,false);
 			for(int i=0;i<players.length;++i){
@@ -127,7 +139,8 @@ public class Blackjack{
 	 * @return	an array of 52 Cards, representing a standard deck
 	 */
 	public static Card[] makeCardArr(int n){
-		Card[] ret=new Card[52*n+1];
+		Card[] ret=new Card[52*n+(n==1?0:1)];
+		//?: op above makes room for a cut card iff more than 1 deck
 		int ind=0;
 		//Iterate through decks
 		for(int k=0;k<n;++k){
@@ -141,8 +154,11 @@ public class Blackjack{
 				}
 			}
 		}
-		//put the cut card in the last spot
-		ret[52*n]=new Card(0,Card.CUT_CARD);
+		//put the cut card in the last spot, iff more than 1 deck
+		if(n>1){
+			ret[52*n]=new Card(0,Card.CUT_CARD);
+			//System.out.println("CUT CARD INSERTED");
+		}
 		return ret;
 	}
 	/**
@@ -154,18 +170,21 @@ public class Blackjack{
 		Card temp=null;
 		int j=0;
 		//Fisher-Yates-Knuth shuffle, except the cut card in the last index
-		for(int i=c.length-2;i>0;--i){
+		//There is only a cut card if there is more than one deck
+		for(int i=c.length-(c.length>52?2:1);i>0;--i){
 			j=(int)(Math.random()*(i));
 			temp=c[i];
 			c[i]=c[j];
 			c[j]=temp;
 		}
-		//put the cut card 70% to 85% into the shoe
-		j=(int)(0.70*c.length+Math.random()*0.10*(c.length));
-		//System.out.printf("CUT CARD AT %d.\n",j);
-		temp=c[j];
-		c[j]=c[c.length-1];
-		c[c.length-1]=temp;
+		//put the cut card 70% to 80% into the shoe, iff there's more than one deck
+		if(c.length>52){
+			j=(int)(0.70*c.length+Math.random()*0.10*(c.length));
+			//System.out.printf("CUT CARD AT %d.\n",j);
+			temp=c[j];
+			c[j]=c[c.length-1];
+			c[c.length-1]=temp;
+		}
 	}
 	/**
 	 * Displays the cards on the table
