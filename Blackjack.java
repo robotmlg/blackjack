@@ -119,10 +119,13 @@ public class Blackjack{
 				}
 				System.out.println("FINAL:");
 				dispTable(players,false);
+				winner=0;
 				for(int i=0;i<players.length;++i){
-					if(handTotal(players[i])>handTotal(players[winner]) && handTotal(players[i])<=21){
+					if(handTotal(players[i])<=21 && handTotal(players[i])>=handTotal(players[winner])){
 						winner=i;
 					}
+					else if(handTotal(players[i])>21)
+						winner++;
 				}
 				if(winner==0)
 					System.out.println("Dealer wins!");
@@ -132,6 +135,7 @@ public class Blackjack{
 				play=IO.readBoolean();
 			}
 		}while(play);
+		System.out.println("Thank you for playing Blackjack with us.  Goodbye.");
 	}
 	/**
 	 * Creates an array of cards, from a variable number of decks
