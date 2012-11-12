@@ -77,7 +77,7 @@ public class Blackjack{
 			}
 			//main game loop
 			//Start with index 1, because the dealer (0) goes last
-			for(int i=1;i<players.length;++i){
+			for(int i=1;lastHand==false && i<players.length;++i){
 				n=2;
 				stood=false;
 				while(handTotal(players[i])<21 && stood==false && n<MAX_CARDS){
@@ -106,30 +106,31 @@ public class Blackjack{
 					}
 				}
 			}
-			dispTable(players,false);
-			System.out.println("Dealing to dealer... (He stands on all 17s)");
-			for(int i=2;handTotal(players[0])<17 && i<MAX_CARDS;++i){
-				players[0][i]=shoe.deal();
-				if(players[0][i].getFace()==Card.CUT_CARD){
-					System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-					lastHand=true;
+			if(!lastHand){
+				dispTable(players,false);
+				System.out.println("Dealing to dealer... (He stands on all 17s)");
+				for(int i=2;handTotal(players[0])<17 && i<MAX_CARDS;++i){
 					players[0][i]=shoe.deal();
+					if(players[0][i].getFace()==Card.CUT_CARD){
+						System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
+						lastHand=true;
+						players[0][i]=shoe.deal();
+					}
 				}
-			}
-			System.out.println("FINAL:");
-			dispTable(players,false);
-			for(int i=0;i<players.length;++i){
-				if(handTotal(players[i])>handTotal(players[winner]) && handTotal(players[i])<=21){
-					winner=i;
+				System.out.println("FINAL:");
+				dispTable(players,false);
+				for(int i=0;i<players.length;++i){
+					if(handTotal(players[i])>handTotal(players[winner]) && handTotal(players[i])<=21){
+						winner=i;
+					}
 				}
+				if(winner==0)
+					System.out.println("Dealer wins!");
+				else
+					System.out.printf("Player %d wins!\n",winner);
+				System.out.print("Play again? ");
+				play=IO.readBoolean();
 			}
-			System.out.println();
-			if(winner==0)
-				System.out.println("Dealer wins!");
-			else
-				System.out.printf("Player %d wins!\n",winner);
-			System.out.print("Play again? ");
-			play=IO.readBoolean();
 		}while(play);
 	}
 	/**
