@@ -22,6 +22,7 @@ public class Card
 	public static final int JACK     = 11;
 	public static final int QUEEN    = 12;
 	public static final int KING     = 13;
+	public static final int CUT_CARD = 14;
 
 
 	// define fields here

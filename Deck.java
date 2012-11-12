@@ -8,7 +8,7 @@ public class Deck
 	public Deck(Card[] deck)
 	{
 		d = deck;
-		index = -1;
+		index = 0;
 	}
 
 	
@@ -18,8 +18,7 @@ public class Deck
 		if (index == d.length)
 			return null;
 		else {
-			index++;
-			return d[index];
+			return d[index++];
 		}
 	}
 	
