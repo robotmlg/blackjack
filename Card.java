@@ -27,7 +27,7 @@ public class Card
 	// define fields here
 	int suit;
 	int face;
-	
+
 	// This constructor builds a card with the given suit and face, turned face down.
 	public Card(int cardSuit, int cardFace)
 	{
@@ -38,24 +38,69 @@ public class Card
 	// This method retrieves the suit (spades, hearts, etc.) of this card.
 	public int getSuit()
 	{
-		return suit; 
+		return suit;
 	}
-	
+
 	// This method retrieves the face (ace through king) of this card.
 	public int getFace()
 	{
-		return face; 
+		return face;
 	}
-	
+
 	// This method retrieves the numerical value of this card
 	// (usually same as card face, except 1 for ace and 10 for jack/queen/king)
 	public int getValue()
 	{
 		if (face <= 10)
 			return face;
-		else 
+		else
 			return 10;
 	}
+	// This method allows you to print a card's values
+	public String toString(){
 
-	
+		String f;
+		char s;
+
+		switch(this.face){
+			case Card.ACE:
+				f = "A";
+				break;
+			case Card.JACK:
+				f = "J";
+				break;
+			case Card.QUEEN:
+				f = "Q";
+				break;
+			case Card.KING:
+				f = "K";
+				break;
+			default:
+				f = Integer.toString(this.getFace());
+				break;
+		}
+
+		switch(this.suit){
+
+			case Card.SPADES:
+				s = '\u2660';
+				break;
+			case Card.DIAMONDS:
+				s = '\u2666';
+				break;
+			case Card.HEARTS:
+				s = '\u2665';
+				break;
+			case Card.CLUBS:
+				s = '\u2663';
+				break;
+			default:
+				s = 'E';
+				break;
+		}
+
+		return f+s;
+
+	}
+
 }
