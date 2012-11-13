@@ -1,6 +1,6 @@
 /**
  * @author	Matt Goldman
- * @version	1.0
+ * @version	2.0
  * @since	2012-11-06
  */
 import java.util.Arrays;
