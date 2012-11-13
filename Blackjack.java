@@ -13,53 +13,97 @@ public class Blackjack{
 	 * @param args
 	 */
 	public static void main(String[] args){
-		Card[][] players=null;
-		Card blank=new Card(0,0);
 		int n=0;
 		int winner=0;
 		int nPlayers=0;
 		int nDecks=0;
-		Card[] cards=null;
-		Deck shoe=null;
+		int[] money=null;
+		double minBet=0;
+		double[] bets=null;
 		char sel=0;
 		boolean stood=false;//whether the player stands
 		boolean play=true;//play again?
 		boolean lastHand=true;//must be true initially to trigger a shuffle
+		Card[] cards=null;
+		Card[][] players=null;
+		Deck shoe=null;
 		//Get number of players
-		System.out.print("E");
-		do{
-			System.out.print("nter number of players: ");
-			nPlayers=IO.readInt();
-			if(nPlayers<1){
-				System.out.println("Number of players must be larger than 0.");
-				System.out.print("Re-e");
-			}
-		}while(nPlayers<1);
+		if(args.length>0)
+			nPlayers=Integer.parseInt(args[0]);
+		else{
+			System.out.print("E");
+			do{
+				System.out.print("nter number of players: ");
+				nPlayers=IO.readInt();
+				if(nPlayers<1){
+					System.out.println("Number of players must be larger than 0.");
+					System.out.print("Re-e");
+				}
+			}while(nPlayers<1);
+		}
 		//Setup array of players
 		//n+1 rows for n players and a dea
 		players=new Card[nPlayers+1][MAX_CARDS];
+		//setup arrays for storing player balances and bets
+		money=new int[nPlayers+1];
+		bets=new double[nPlayers+1];
+		Arrays.fill(bets,0);
 		//Get number of decks
-		System.out.print("E");
-		do{
-			System.out.print("nter number of decks: ");
-			nDecks=IO.readInt();
-			if(nDecks<1){
-				System.out.println("Number of decks must be larger than 0");
-				System.out.print("Re-e");
-			}
-		}while(nDecks<1);
-		cards=makeCardArr(nDecks);
+		if(args.length>1)
+			nDecks=Integer.parseInt(args[1]);
+		else{
+			System.out.print("E");
+			do{
+				System.out.print("nter number of decks: ");
+				nDecks=IO.readInt();
+				if(nDecks<1){
+					System.out.println("Number of decks must be larger than 0");
+					System.out.print("Re-e");
+				}
+			}while(nDecks<1);
+		}
+		//Get initial balance
+		if(args.length>2)
+			Arrays.fill(money,Integer.parseInt(args[2]));
+		else{
+			System.out.print("E");
+			do{
+				System.out.print("nter players' initial balance: ");
+				n=IO.readInt();
+				if(n<=0){
+					System.out.println("Initial balance must be larger than $0.");
+					System.out.print("Re-e");
+				}
+			}while(n<=0);
+			Arrays.fill(money,n);
+		}
+		//get minimum bet
+		if(args.length>3)
+			minBet=Double.parseDouble(args[3]);
+		else{
+			System.out.print("E");
+			do{
+				System.out.print("nter the minimum bet: ");
+				minBet=IO.readDouble();
+				if(minBet<=0){
+					System.out.println("Minimum bet must be larger than $0.");
+					System.out.print("Re-e");
+				}
+			}while(minBet<=0);
+		}
+		//game loop
 		do{
 			System.out.println();
 			if(lastHand==true || nDecks==1){
 				System.out.printf("Shuffling deck%s...\n",nDecks==1?"":"s");
+				cards=makeCardArr(nDecks);
 				shuffle(cards);
 				shoe=new Deck(cards);
 				lastHand=false;
 			}
 			//Fill the players[][] array with blank Cards
 			for(int i=0;i<players.length;++i)
-				Arrays.fill(players[i],blank);
+				Arrays.fill(players[i],null);
 			System.out.println("Dealing...");
 			for(int j=0;j<2;++j){
 				for(int i=0;i<players.length && !shoe.isEmpty();++i){
@@ -75,9 +119,9 @@ public class Blackjack{
 				System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
 				lastHand=true;
 			}
-			//main game loop
+			//players loop
 			//Start with index 1, because the dealer (0) goes last
-			for(int i=1;lastHand==false && i<players.length;++i){
+			for(int i=1;!shoe.isEmpty() && i<players.length;++i){
 				n=2;
 				stood=false;
 				while(handTotal(players[i])<21 && stood==false && n<MAX_CARDS){
@@ -86,12 +130,13 @@ public class Blackjack{
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
-							players[i][n++]=shoe.deal();
+							players[i][n]=shoe.deal();
 							if(players[i][n].getFace()==Card.CUT_CARD){
 								System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
 								lastHand=true;
 								players[i][n]=shoe.deal();
 							}
+							++n;
 							stood=false;
 							break;
 						case 'S':
@@ -106,7 +151,7 @@ public class Blackjack{
 					}
 				}
 			}
-			if(!lastHand){
+			if(!shoe.isEmpty()){
 				dispTable(players,false);
 				System.out.println("Dealing to dealer... (He stands on all 17s)");
 				for(int i=2;handTotal(players[0])<17 && i<MAX_CARDS;++i){
@@ -216,7 +261,7 @@ public class Blackjack{
 				dispCard(c[j][i]);
 				System.out.print("\t\t");
 				//Keep track of how many blank cards are in the next row
-				if(c[j][i+1].getFace()==Card.BLANK)
+				if(c[j][i+1]==null)
 					++blankCount;
 			}
 			System.out.print("\n");
@@ -251,6 +296,8 @@ public class Blackjack{
 	 * @param	c	a Card
 	 */
 	public static void dispCard(Card c){
+		if(c==null)
+			return;
 		switch(c.getFace()){
 			case Card.ACE:
 				System.out.print("A");
@@ -264,8 +311,6 @@ public class Blackjack{
 			case Card.KING:
 				System.out.print("K");
 				break;
-			case Card.BLANK:
-				return;
 			default:
 				System.out.print(c.getFace());
 				break;
@@ -295,11 +340,11 @@ public class Blackjack{
 	 */
 	public static int handTotal(Card[] h){
 		int ret=0;
-		for(int i=0;i<h.length && h[i].getFace()!=0;++i)
+		for(int i=0;i<h.length && h[i]!=null;++i)
 			ret+=(h[i].getValue()==1?11:h[i].getValue());
 		if(ret>21){
 			ret=0;
-			for(int i=0;i<h.length && h[i].getFace()!=0;++i)
+			for(int i=0;i<h.length && h[i]!=null;++i)
 				ret+=h[i].getValue();
 		}
 		return ret;

@@ -8,7 +8,6 @@ public class Card
 	public static final int DIAMONDS = 3;
 
 	// Card faces (provided for your convenience - use is optional)
-	public static final int BLANK	 = 0;
 	public static final int ACE      = 1;
 	public static final int TWO      = 2;
 	public static final int THREE    = 3;
