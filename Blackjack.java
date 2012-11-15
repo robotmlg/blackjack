@@ -31,7 +31,7 @@ public class Blackjack{
 		boolean stood=false;//whether the player stands
 		boolean play=true;//play again?
 		boolean lastHand=true;//must be true initially to trigger a shuffle
-		Card[] cards=null;
+		//Card[] cards=null;
 		Card[][] players=null;
 		Deck shoe=null;
 		//Get number of players
@@ -77,7 +77,7 @@ public class Blackjack{
 			do{
 				System.out.print("nter players' initial balance: ");
 				iniBal=IO.readDouble();
-				if(n<=0){
+				if(iniBal<=0){
 					System.out.println("Initial balance must be larger than $0.");
 					System.out.print("Re-e");
 				}
@@ -105,9 +105,8 @@ public class Blackjack{
 			System.out.println();
 			if(lastHand==true || nDecks==1){
 				System.out.printf("Shuffling deck%s...\n",nDecks==1?"":"s");
-				cards=makeCardArr(nDecks);
-				shuffle(cards);
-				shoe=new Deck(cards);
+				shoe=new Deck(nDecks);
+				shoe.shuffle();
 				lastHand=false;
 			}
 			//Fill the players[][] array with blank Cards
@@ -186,7 +185,7 @@ public class Blackjack{
 						players[0][i]=shoe.deal();
 					}
 				}
-				
+
 				/*
 				winner=0;
 				for(int i=0;i<players.length;++i){
@@ -258,6 +257,7 @@ public class Blackjack{
 	 * @param	n	number of decks to use
 	 * @return	an array of 52 Cards, representing a standard deck
 	 */
+	@Deprecated
 	public static Card[] makeCardArr(int n){
 		Card[] ret=new Card[52*n+(n==1?0:1)];
 		//?: op above makes room for a cut card iff more than 1 deck
@@ -286,6 +286,7 @@ public class Blackjack{
 	 *
 	 * @param	c	an array of Cards
 	 */
+	@Deprecated
 	public static void shuffle(Card[] c){
 		Card temp=null;
 		int j=0;
