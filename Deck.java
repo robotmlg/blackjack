@@ -69,7 +69,7 @@ public class Deck
 		//put the cut card 70% to 80% into the shoe, iff there's more than one deck
 		if(d.length>52){
 			j=(int)(0.70*d.length+Math.random()*0.10*(d.length));
-			System.out.printf("CUT CARD AT %d.\n",j);
+			//System.out.printf("CUT CARD AT %d.\n",j);
 			temp=d[j];
 			d[j]=d[d.length-1];
 			d[d.length-1]=temp;

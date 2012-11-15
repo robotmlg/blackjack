@@ -25,6 +25,7 @@ public class Blackjack{
 		int dval=0;
 		double minBet=0;
 		double iniBal=0;
+		double ddown=0;
 		double[] money=null;
 		double[] bets=null;
 		char sel=0;
@@ -49,7 +50,7 @@ public class Blackjack{
 			}while(nPlayers<1);
 		}
 		//Setup array of players
-		//n+1 rows for n players and a dea
+		//n+1 rows for n players and a dealer
 		players=new Card[nPlayers+1][MAX_CARDS];
 		//setup arrays for storing player balances and bets
 		money=new double[nPlayers+1];
@@ -143,9 +144,9 @@ public class Blackjack{
 			for(int i=1;!shoe.isEmpty() && i<players.length;++i){
 				n=2;
 				stood=false;
-				while(handTotal(players[i])<21 && stood==false && n<MAX_CARDS){
+				for(int j=0;handTotal(players[i])<21 && stood==false && n<MAX_CARDS;++j){
 					dispTable(players,money,bets,true);
-					System.out.printf("Player %d:\tH: Hit\t\tS: Stand\tQ: Quit\nChoice: ",i);
+					System.out.printf("Player %d:  H: Hit  S: Stand  D: Double Down  %sQ: Quit\nChoice: ",i,j==1?"S: Split  ":"");
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
@@ -160,6 +161,29 @@ public class Blackjack{
 							break;
 						case 'S':
 							stood=true;
+							break;
+						case 'D':
+							System.out.print("E");
+							do{
+								System.out.printf("nter amount to increase bet (up to $%03.2f): ",bets[i]);
+								ddown=IO.readDouble();
+								if(ddown>bets[i]){
+									System.out.print("Bet cannot be larger than original bet.\n");
+									System.out.print("Re-e");
+								}
+								else if(ddown<=0){
+									System.out.print("Bet cannot be negative.\n");
+									System.out.print("Re-e");
+								}
+							}while(ddown>bets[i] || ddown<=0);
+							bets[i]+=ddown;
+							stood=true;
+							players[i][n]=shoe.deal();
+							if(players[i][n].getFace()==Card.CUT_CARD){
+								System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
+								lastHand=true;
+								players[i][n]=shoe.deal();
+							}
 							break;
 						case 'Q':
 							System.out.println("Goodbye.");
@@ -318,6 +342,7 @@ public class Blackjack{
 	public static void dispTable(Card[][] c,double[] m,double[] b,boolean hide){
 		int blankCount=0;
 		int ht=0;
+		System.out.println();
 		//Print balances (above player labels)
 		for(int i=0;i<m.length;++i)
 			System.out.printf("%-10s",String.format("$%03.2f",m[i]));
