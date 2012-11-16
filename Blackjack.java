@@ -32,6 +32,7 @@ public class Blackjack{
 		boolean stood=false;//whether the player stands
 		boolean play=true;//play again?
 		boolean lastHand=true;//must be true initially to trigger a shuffle
+		boolean first=true;//first card of the round for the player
 		//Card[] cards=null;
 		Card[][] players=null;
 		Deck shoe=null;
@@ -144,9 +145,10 @@ public class Blackjack{
 			for(int i=1;!shoe.isEmpty() && i<players.length;++i){
 				n=2;
 				stood=false;
-				for(int j=0;handTotal(players[i])<21 && stood==false && n<MAX_CARDS;++j){
+				first=true;
+				while(handTotal(players[i])<21 && stood==false && n<MAX_CARDS){
 					dispTable(players,money,bets,true);
-					System.out.printf("Player %d:  H: Hit  S: Stand  D: Double Down  %sQ: Quit\nChoice: ",i,j==1?"S: Split  ":"");
+					System.out.printf("Player %d:  H: Hit  S: Stand  D: Double Down  %sQ: Quit\nChoice: ",i,first==true?"P: Split  ":"");
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
@@ -158,9 +160,11 @@ public class Blackjack{
 							}
 							++n;
 							stood=false;
+							first=false;
 							break;
 						case 'S':
 							stood=true;
+							first=false;
 							break;
 						case 'D':
 							System.out.print("E");
@@ -184,6 +188,10 @@ public class Blackjack{
 								lastHand=true;
 								players[i][n]=shoe.deal();
 							}
+							first=false;
+							break;
+						case 'P':
+							first=false;
 							break;
 						case 'Q':
 							System.out.println("Goodbye.");
