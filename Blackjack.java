@@ -11,7 +11,7 @@ public class Blackjack{
 	/**
 	 * A CLI game of Blackjack
 	 *
-	 * All arguments optional
+	 * arguments optional
 	 * @param	args[0]	number of players
 	 * @param	args[1]	number of decks in shoe
 	 * @param	args[2]	initial balance
@@ -50,6 +50,8 @@ public class Blackjack{
 		//Setup array of players
 		//n+1 for n players and a dealer
 		players=new Player[nPlayers+1];
+		for(int i=0;i<players.length;++i)
+			players[i]=new Player();
 		//Get number of decks
 		if(args.length>1)
 			nDecks=Integer.parseInt(args[1]);
@@ -79,9 +81,8 @@ public class Blackjack{
 			}while(iniBal<=0);
 		}
 		//set each player's initial balance, leave dealer's bank at 0
-		/*for(int i=1;i<players.length-1;++i)
-			players[i].money=iniBal;*/
-		players[0].money=iniBal;
+		for(int i=1;i<players.length;++i)
+			players[i].money=iniBal;
 		//get minimum bet
 		if(args.length>3)
 			minBet=Double.parseDouble(args[3]);

@@ -4,10 +4,19 @@
  * @since	2012-11-16
  */
 public class Player{
-	Card[] hand=new Card[11];//maximum 11 cards without busting (do the math)
-	double bet=0;//amount of the player's bet
-	double money=0;//player's bank
-	boolean stood=false;//whether or not the player has stood
+	Card[] hand;
+	double bet;//amount of the player's bet
+	double money;//player's bank
+	boolean stood;//whether or not the player has stood
+	/**
+	 * Constructs a player
+	 */
+	public Player(){
+		bet=0;
+		money=0;
+		stood=false;
+		hand=new Card[11];//maximum 11 cards without busting (do the math)
+	}
 	/**
 	 * Calculates the total hand value for a given player
 	 *
