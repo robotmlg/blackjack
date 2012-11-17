@@ -9,6 +9,7 @@ public class Player{
 	double money;//player's bank
 	boolean stood;//whether or not the player has stood
 	int pid;//player id (not unique)
+	int splits;//how many splits this hand has undergone
 	/**
 	 * Constructs a player
 	 */
@@ -16,6 +17,7 @@ public class Player{
 		pid=x;
 		bet=0;
 		money=0;
+		splits=0;
 		stood=false;
 		hand=new Card[11];//maximum 11 cards without busting (do the math)
 	}

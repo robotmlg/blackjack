@@ -24,6 +24,7 @@ public class Blackjack{
 		int nDecks=0;
 		int pval=0;
 		int dval=0;
+		int maxSplits=0;
 		double minBet=0;
 		double iniBal=0;
 		double ddown=0;
@@ -33,6 +34,7 @@ public class Blackjack{
 		boolean first=true;//first card of the round for the player
 		ArrayList<Player> players=null;
 		Deck shoe=null;
+
 		//Get number of players
 		if(args.length>0)
 			nPlayers=Integer.parseInt(args[0]);
@@ -55,7 +57,7 @@ public class Blackjack{
 		//Get number of decks
 		if(args.length>1)
 			nDecks=Integer.parseInt(args[1]);
-		else{
+		else if(nDecks==0){
 			System.out.print("E");
 			do{
 				System.out.print("nter number of decks: ");
@@ -66,10 +68,24 @@ public class Blackjack{
 				}
 			}while(nDecks<1);
 		}
-		//Get initial balance
+		//Get max number of splits
 		if(args.length>2)
-			iniBal=Double.parseDouble(args[2]);
-		else{
+			maxSplits=Integer.parseInt(args[2]);
+		else if(maxSplits==0){
+			System.out.print("E");
+			do{
+				System.out.print("nter max number of splits: ");
+				maxSplits=IO.readInt();
+				if(maxSplits<1){
+					System.out.println("Number of splits must be larger than 0");
+					System.out.print("Re-e");
+				}
+			}while(maxSplits<1);
+		}
+		//Get initial balance
+		if(args.length>3)
+			iniBal=Double.parseDouble(args[3]);
+		else if(iniBal==0){
 			System.out.print("E");
 			do{
 				System.out.print("nter players' initial balance: ");
@@ -84,9 +100,9 @@ public class Blackjack{
 		for(int i=1;i<players.size();++i)
 			players.get(i).money=iniBal;
 		//get minimum bet
-		if(args.length>3)
-			minBet=Double.parseDouble(args[3]);
-		else{
+		if(args.length>4)
+			minBet=Double.parseDouble(args[4]);
+		else if(minBet==0){
 			System.out.print("E");
 			do{
 				System.out.print("nter the minimum bet: ");
@@ -106,9 +122,15 @@ public class Blackjack{
 				shoe.shuffle();
 				lastHand=false;
 			}
-			//Fill the players array with null Cards
-			for(int i=0;i<players.size();++i)
+			//reset players
+			for(int i=0;i<players.size();++i){
+				//Fill the players hands with null Cards
 				Arrays.fill(players.get(i).hand,null);
+				//reset split count
+				players.get(i).splits=0;
+				//unstand
+				players.get(i).stood=false;
+			}
 			//get bets
 			System.out.println("Place your bets!");
 			for(int i=1;i<players.size();++i){
@@ -138,12 +160,14 @@ public class Blackjack{
 			//Start with index 1, because the dealer (0) goes last
 			for(int i=1;!shoe.isEmpty() && i<players.size();++i){
 				n=2;
-				players.get(i).stood=false;
 				first=true;
 				while(players.get(i).handTotal()<21 && players.get(i).stood==false && n<MAX_CARDS){
 					dispTable(players,true);
 					System.out.printf("\nPlayer %s:  H: Hit  S: Stand  D: Double Down  ",players.get(i).pid);
-					System.out.printf("%s",first==true?"P: Split  ":"");
+					if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue())
+						System.out.printf("P: Split  ");
+					if(first==true && players.get(i).splits==0)
+						System.out.printf("G: Give-up  ");
 					System.out.printf("Q: Quit\nChoice: ");
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
@@ -187,6 +211,47 @@ public class Blackjack{
 							first=false;
 							break;
 						case 'P':
+							if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue()){
+								//make a second Player, but with the same pid
+								players.add(i+1,new Player(players.get(i).pid));
+								//move the player's second card to the new player
+								players.get(i+1).hand[0]=players.get(i).hand[1];
+								//deal each a new card
+								players.get(i).hand[1]=shoe.deal();
+								if(players.get(i).hand[1].getFace()==Card.CUT_CARD){
+									System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
+									lastHand=true;
+									players.get(i).hand[1]=shoe.deal();
+								}
+								players.get(i+1).hand[1]=shoe.deal();
+								if(players.get(i+1).hand[1].getFace()==Card.CUT_CARD){
+									System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
+									lastHand=true;
+									players.get(i+1).hand[1]=shoe.deal();
+								}
+								//transfer bet
+								players.get(i+1).bet=players.get(i).bet;
+								players.get(i).money-=players.get(i).bet;
+								//inc splits
+								players.get(i+1).splits=++players.get(i).splits;
+								//can't hit split aces
+								if(players.get(i+1).hand[0].getFace()==Card.ACE){
+									players.get(i).stood=true;
+									players.get(i+1).stood=true;
+								}
+							}
+							else
+								System.out.println("Invalid choice. Select again.");
+							break;
+						case 'G':
+							if(first==true && players.get(i).splits==0){
+								players.get(i).money+=players.get(i).bet/2;
+								players.get(DEALER).money+=players.get(i).bet/2;
+								players.get(i).bet=0;
+								players.get(i).stood=true;
+							}
+							else
+								System.out.println("Invalid choice. Select again.");
 							first=false;
 							break;
 						case 'Q':
@@ -269,6 +334,12 @@ public class Blackjack{
 					}
 					else if(pval>21)
 						players.get(DEALER).money+=players.get(i).bet;
+					//Reconcile split hands
+					if(players.get(i).pid!=i){
+						players.get(players.get(i).pid).money+=players.get(i).money;
+						players.remove(i);
+						--i;
+					}
 				}
 				for(int i=1;i<players.size();++i)
 					players.get(i).bet=0;
