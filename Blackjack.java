@@ -31,10 +31,39 @@ public class Blackjack{
 		char sel=0;
 		boolean play=true;//play again?
 		boolean lastHand=true;//must be true initially to trigger a shuffle
-		boolean first=true;//first card of the round for the player
+		boolean first=false;//first card of the round for the player
+		boolean softHit=false;
 		ArrayList<Player> players=null;
 		Deck shoe=null;
 
+		//Use a preset gamemode
+		System.out.println("Select a gamemode:");
+		System.out.println("A: Atlantic City\n\t-8 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
+		System.out.println("L: Las Vegas\n\t-4 deck shoe\n\t-Resplit to 4\n\t-Dealer hits soft 17s");
+		System.out.print("C: Custom\nChoice: ");
+		do{
+			sel=IO.readChar();
+			switch(Character.toUpperCase(sel)){
+				case 'A':
+					nDecks=8;
+					maxSplits=2;
+					softHit=false;
+					first=true;
+					break;
+				case 'L':
+					nDecks=4;
+					maxSplits=2;
+					softHit=true;
+					first=true;
+					break;
+				case 'C':
+					first=true;
+					break;
+				default:
+					System.out.print("Invalid selection. Choose again:");
+					break;
+			}
+		}while(first=false);
 		//Get number of players
 		if(args.length>0)
 			nPlayers=Integer.parseInt(args[0]);
@@ -82,13 +111,18 @@ public class Blackjack{
 				}
 			}while(maxSplits<1);
 		}
+		//soft 17 hit?
+		if(Character.toUpperCase(sel)=='C'){
+			System.out.print("Should the dealer hit soft 17s?");
+			softHit=IO.readBoolean();
+		}
 		//Get initial balance
 		if(args.length>3)
 			iniBal=Double.parseDouble(args[3]);
 		if(iniBal<=0){
 			System.out.print("E");
 			do{
-				System.out.print("nter players' initial balance: ");
+				System.out.print("nter players' initial balance: $");
 				iniBal=IO.readDouble();
 				if(iniBal<=0){
 					System.out.println("Initial balance must be larger than $0.");
@@ -105,7 +139,7 @@ public class Blackjack{
 		if(minBet<=0){
 			System.out.print("E");
 			do{
-				System.out.print("nter the minimum bet: ");
+				System.out.print("nter the minimum bet: $");
 				minBet=IO.readDouble();
 				if(minBet<=0){
 					System.out.println("Minimum bet must be larger than $0.");
@@ -269,8 +303,17 @@ public class Blackjack{
 			}
 			if(!shoe.isEmpty()){
 				dispTable(players,false);
-				System.out.println("Dealing to dealer... (He stands on all 17s)");
-				for(int i=2;players.get(DEALER).handTotal()<17 && i<MAX_CARDS;++i){
+				System.out.println("Dealing to dealer...");
+				if(softHit==true)
+					System.out.println("(He hits on soft 17s)");
+				else
+					System.out.println("(He stands on all 17s)");
+				for(int i=2;players.get(DEALER).handTotal()<=17 && i<MAX_CARDS;++i){
+					if(players.get(DEALER).handTotal()==17 && softHit==true){
+							players.get(DEALER).hand[i]=shoe.deal();
+					}
+					else if(players.get(DEALER).handTotal()==17)
+						break;
 					players.get(DEALER).hand[i]=shoe.deal();
 					if(players.get(DEALER).hand[i].getFace()==Card.CUT_CARD){
 						System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
