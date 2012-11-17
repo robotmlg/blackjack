@@ -1,3 +1,6 @@
+//Written by some guys at Rutgers University
+//improved by Matt Goldman
+//Do not use without permission
 // This class represents the deck of cards from which cards are dealt to players.
 public class Deck
 {

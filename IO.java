@@ -1,3 +1,5 @@
+//Written by some guys at Rutgers University
+//Do not use without permission
 import java.io.*;
 
 public class IO

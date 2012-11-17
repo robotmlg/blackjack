@@ -38,7 +38,7 @@ public class Blackjack{
 		//Get number of players
 		if(args.length>0)
 			nPlayers=Integer.parseInt(args[0]);
-		else{
+		if(nPlayers<1){
 			System.out.print("E");
 			do{
 				System.out.print("nter number of players: ");
@@ -57,7 +57,7 @@ public class Blackjack{
 		//Get number of decks
 		if(args.length>1)
 			nDecks=Integer.parseInt(args[1]);
-		else if(nDecks==0){
+		if(nDecks<1){
 			System.out.print("E");
 			do{
 				System.out.print("nter number of decks: ");
@@ -71,7 +71,7 @@ public class Blackjack{
 		//Get max number of splits
 		if(args.length>2)
 			maxSplits=Integer.parseInt(args[2]);
-		else if(maxSplits==0){
+		if(maxSplits<1){
 			System.out.print("E");
 			do{
 				System.out.print("nter max number of splits: ");
@@ -85,7 +85,7 @@ public class Blackjack{
 		//Get initial balance
 		if(args.length>3)
 			iniBal=Double.parseDouble(args[3]);
-		else if(iniBal==0){
+		if(iniBal<=0){
 			System.out.print("E");
 			do{
 				System.out.print("nter players' initial balance: ");
@@ -102,7 +102,7 @@ public class Blackjack{
 		//get minimum bet
 		if(args.length>4)
 			minBet=Double.parseDouble(args[4]);
-		else if(minBet==0){
+		if(minBet<=0){
 			System.out.print("E");
 			do{
 				System.out.print("nter the minimum bet: ");

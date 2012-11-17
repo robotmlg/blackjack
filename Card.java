@@ -1,3 +1,6 @@
+//Written by some people at Rutgers University
+//modified (some would say "improved") by Matt Goldman
+//Do not use without permission
 // This class represents one playing card.
 public class Card
 {
