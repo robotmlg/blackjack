@@ -8,10 +8,12 @@ public class Player{
 	double bet;//amount of the player's bet
 	double money;//player's bank
 	boolean stood;//whether or not the player has stood
+	int pid;//player id (not unique)
 	/**
 	 * Constructs a player
 	 */
-	public Player(){
+	public Player(int x){
+		pid=x;
 		bet=0;
 		money=0;
 		stood=false;
