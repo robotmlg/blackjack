@@ -28,8 +28,8 @@ public class Card
 
 
 	// define fields here
-	int suit;
-	int face;
+	private int suit;
+	private int face;
 
 	// This constructor builds a card with the given suit and face, turned face down.
 	public Card(int cardSuit, int cardFace)
@@ -58,6 +58,17 @@ public class Card
 			return face;
 		else
 			return 10;
+	}
+	/**
+	 * Returns true if the argument card has the same value
+	 *
+	 * @param	c	the card to compare to
+	 * @return	whether they have equal values
+	 */
+	public boolean equalVal(Card c){
+		if(this.getValue()==c.getValue())
+			return true;
+		return false;
 	}
 	// This method allows you to print a card's values
 	public String toString(){

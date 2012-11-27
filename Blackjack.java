@@ -113,7 +113,7 @@ public class Blackjack{
 		}
 		//soft 17 hit?
 		if(Character.toUpperCase(sel)=='C'){
-			System.out.print("Should the dealer hit soft 17s?");
+			System.out.print("Should the dealer hit soft 17s? ");
 			softHit=IO.readBoolean();
 		}
 		//Get initial balance
@@ -164,6 +164,8 @@ public class Blackjack{
 				players.get(i).splits=0;
 				//unstand
 				players.get(i).stood=false;
+				//reset index
+				players.get(i).index=0;
 			}
 			//get bets
 			System.out.println("Place your bets!");
@@ -230,7 +232,7 @@ public class Blackjack{
 							first=false;
 							break;
 						case 'P':
-							if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue()){
+							if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].equalVal(players.get(i).hand[1])){
 								//make a second Player, but with the same pid
 								players.add(i+1,new Player(players.get(i).pid));
 								//move the player's second card to the new player

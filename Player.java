@@ -30,15 +30,17 @@ public class Player{
 	 */
 	public int handTotal(){
 		int ret=0;
+		int aces=0;
 		//Calculate with Ace=11
 		for(int i=0;i<hand.length && hand[i]!=null;++i){
 			ret+=(hand[i].getValue()==1?11:hand[i].getValue());
+			if(hand[i].getValue()==1)
+				++aces;
 		}
-		//If the hand is a bust, recalculate with Ace=1
-		if(ret>21){
-			ret=0;
-			for(int i=0;i<hand.length && hand[i]!=null;++i)
-				ret+=hand[i].getValue();
+		//If the hand is a bust, change each Ace to value 1 until the hand is not a bust
+		if(ret>21 && aces>0){
+			for(;aces>0 && ret>21;--aces)
+				ret-=10;
 		}
 		return ret;
 	}
