@@ -7,6 +7,7 @@ public class Player{
 	Card[] hand;
 	double bet;//amount of the player's bet
 	double money;//player's bank
+	double ins;//insurance bet
 	boolean stood;//whether or not the player has stood
 	int pid;//player id (not unique)
 	int splits;//how many splits this hand has undergone
@@ -21,6 +22,7 @@ public class Player{
 		splits=0;
 		stood=false;
 		index=0;
+		ins=0;
 		hand=new Card[11];//maximum 11 cards without busting (do the math)
 	}
 	/**

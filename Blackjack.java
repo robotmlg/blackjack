@@ -33,6 +33,7 @@ public class Blackjack{
 		boolean bCutCard=false;//whether or not the cut card got drawn
 		boolean first=false;//first card of the round for the player
 		boolean softHit=false;
+		boolean showHole=false;//show the hole card?
 		ArrayList<Player> players=null;
 		Deck shoe=null;
 		//Use a preset gamemode
@@ -154,6 +155,7 @@ public class Blackjack{
 				shoe=new Deck(nDecks);
 				shoe.shuffle();
 				bShuffle=false;
+				showHole=false;
 			}
 			//reset players
 			for(int i=0;i<players.size();++i){
@@ -187,12 +189,54 @@ public class Blackjack{
 			if(shoe.isEmpty()){
 				System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
 			}
+			//INSURANCE
+			players.get(DEALER).hand[0]=new Card(Card.SPADES,Card.KING);
+			players.get(DEALER).hand[1]=new Card(Card.SPADES,Card.ACE);
+			if(players.get(DEALER).hand[1].getFace()==Card.ACE){
+				dispTable(players,false);
+				System.out.println("\nThe dealer is showing an Ace. Insurance open.");
+				System.out.println("Maximum insurance amount is half of your original bet.\n");
+				for(int i=1;i<players.size();++i){
+					do{
+						System.out.printf("Player %d: Enter insurance amount. Enter 0 for no insurance: $",i);
+						players.get(i).ins=IO.readDouble();
+						if(players.get(i).ins>players.get(i).bet/2)
+							System.out.printf("Bet must be less than $%03.2f. Re-enter.\n",players.get(i).bet/2);
+						else if(players.get(i).ins<0)
+							System.out.printf("Bet must be larger than 0. Re-enter.\n");
+					}while(players.get(i).ins<0 || players.get(i).ins>players.get(i).bet/2);
+					players.get(i).money-=players.get(i).ins;
+					if(players.get(i).ins>0)showHole=true;
+				}
+				System.out.println("Insurance closed.");
+				if(showHole==true){
+					dispTable(players,true);
+					if(players.get(DEALER).hasBJ()){
+						System.out.println("\nDealer has blackjack!\nPaying out insurance...\n");
+						for(int i=1;i<players.size();++i){
+							//Insurance pays out 2:1
+							players.get(i).money+=3*players.get(i).ins;
+							players.get(DEALER).money-=2*players.get(i).ins;
+							players.get(i).ins=0;
+						}
+					}
+					else{
+						System.out.println("\nDealer does not have blackjack!\nInsurance bets are lost...\n");
+						for(int i=1;i<players.size();++i){
+							players.get(DEALER).money+=players.get(i).ins;
+							players.get(i).ins=0;
+						}
+					}
+				}
+				else
+					System.out.println("No one bought insurance. The round continues.\n");
+			}
 			//players loop
 			//Start with index 1, because the dealer (at index 0) goes last
 			for(int i=1;!shoe.isEmpty() && i<players.size();++i){
 				first=true;
 				while(players.get(i).handTotal()<21 && players.get(i).stood==false){
-					dispTable(players,true);
+					dispTable(players,showHole);
 					System.out.printf("\nPlayer %s:  H: Hit  S: Stand  D: Double Down  ",players.get(i).pid);
 					if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue())
 						System.out.printf("P: Split  ");
@@ -354,7 +398,7 @@ public class Blackjack{
 				for(int i=1;i<players.size();++i)
 					players.get(i).bet=0;
 				System.out.println("FINAL:");
-				dispTable(players,false);
+				dispTable(players,true);
 				System.out.print("Play again? ");
 				play=IO.readBoolean();
 			}
@@ -364,12 +408,10 @@ public class Blackjack{
 	/**
 	 * Displays the cards on the table
 	 *
-	 * @param	c	the cards
-	 * @param	m	the money
-	 * @param	b	the bets
-	 * @param	hide	obscure dealer's first card?
+	 * @param	c	the Players
+	 * @param	show	obscure dealer's first card?
 	 */
-	public static void dispTable(ArrayList<Player> c,boolean hide){
+	public static void dispTable(ArrayList<Player> c,boolean show){
 		int blankCount=0;
 		int ht=0;
 		System.out.println();
@@ -386,8 +428,8 @@ public class Blackjack{
 		for(int i=0;i<MAX_CARDS;++i){
 			blankCount=0;
 			for(int j=0;j<c.size();++j){
-				if(hide==true && j==0 && i==0){
-					System.out.printf("%-10s","XX");
+				if(show==false && j==0 && i==0){
+					System.out.printf("%-10s","????");
 					continue;
 				}
 				if(c.get(j).hand[i]!=null)
@@ -406,7 +448,7 @@ public class Blackjack{
 		for(int i=0;i<c.size();++i)
 			System.out.print("----------");
 		System.out.println();
-		if(hide)
+		if(show==false)
 			System.out.printf("%-10s","??");
 		else{
 			ht=c.get(DEALER).handTotal();
