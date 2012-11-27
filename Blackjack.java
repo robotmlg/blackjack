@@ -330,18 +330,18 @@ public class Blackjack{
 						}
 					}
 					else if(pval<=21 && dval<=21){//no bust
-						if(pval>dval){
-							if(pval==21 && players.get(i).hand[2]==null){
-								players.get(i).money+=2.5*players.get(i).bet;//Blackjack pays 3:2
+						if(pval>dval){//player wins
+							if(pval==21 && players.get(i).hand[2]==null && players.get(i).splits==0){
+								players.get(i).money+=2.5*players.get(i).bet;//Blackjack pays 3:2, except on a split
 								players.get(DEALER).money-=1.5*players.get(i).bet;
 							}
 							else{
 								players.get(i).money+=2*players.get(i).bet;//win pays 1:1
 								players.get(DEALER).money-=players.get(i).bet;
 							}
-					}
-						else if(pval==dval){
-							if(pval==21 && players.get(i).hand[2]==null && players.get(DEALER).hand[2]!=null){
+						}
+						else if(pval==dval){//possible push
+							if(pval==21 && players.get(i).hand[2]==null && players.get(DEALER).hand[2]!=null && players.get(i).splits==0){
 								players.get(i).money+=2.5*players.get(i).bet;//Blackjack beats other 21s
 								players.get(DEALER).money-=1.5*players.get(i).bet;
 							}
@@ -351,10 +351,10 @@ public class Blackjack{
 							else
 								players.get(i).money+=players.get(i).bet;//push: player's bet returned
 						}
-						else
+						else//dealer wins
 							players.get(DEALER).money+=players.get(i).bet;//player loses, dealer gets bet
 					}
-					else if(pval>21)
+					else if(pval>21)//player bust, lose bet
 						players.get(DEALER).money+=players.get(i).bet;
 					//Reconcile split hands
 					if(players.get(i).pid!=i){
