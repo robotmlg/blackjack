@@ -179,12 +179,7 @@ public class Blackjack{
 			System.out.println("Dealing...");
 			for(int j=0;j<2;++j){
 				for(int i=0;i<players.size() && !shoe.isEmpty();++i){
-					players.get(i).hand[j]=shoe.deal();
-					if(players.get(i).hand[j].getFace()==Card.CUT_CARD){
-						System.out.println("\nCUT CARD DRAWN. LAST HAND\n");
-						players.get(i).hand[j]=shoe.deal();
-						lastHand=true;
-					}
+					lastHand=players.get(i).addCard(shoe);
 				}
 			}
 			if(shoe.isEmpty()){
@@ -206,13 +201,7 @@ public class Blackjack{
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
-							players.get(i).hand[n]=shoe.deal();
-							if(players.get(i).hand[n].getFace()==Card.CUT_CARD){
-								System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-								lastHand=true;
-								players.get(i).hand[n]=shoe.deal();
-							}
-							++n;
+							lastHand=players.get(i).addCard(shoe);
 							players.get(i).stood=false;
 							first=false;
 							break;
@@ -235,13 +224,9 @@ public class Blackjack{
 								}
 							}while(ddown>players.get(i).bet || ddown<=0);
 							players.get(i).bet+=ddown;
+							players.get(i).money-=ddown;
 							players.get(i).stood=true;
-							players.get(i).hand[n]=shoe.deal();
-							if(players.get(i).hand[n].getFace()==Card.CUT_CARD){
-								System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-								lastHand=true;
-								players.get(i).hand[n]=shoe.deal();
-							}
+							lastHand=players.get(i).addCard(shoe);
 							first=false;
 							break;
 						case 'P':
@@ -249,20 +234,12 @@ public class Blackjack{
 								//make a second Player, but with the same pid
 								players.add(i+1,new Player(players.get(i).pid));
 								//move the player's second card to the new player
-								players.get(i+1).hand[0]=players.get(i).hand[1];
+								players.get(i+1).addCard(players.get(i).hand[1]);
+								//go back a card in the first hand
+								players.get(i).index--;
 								//deal each a new card
-								players.get(i).hand[1]=shoe.deal();
-								if(players.get(i).hand[1].getFace()==Card.CUT_CARD){
-									System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-									lastHand=true;
-									players.get(i).hand[1]=shoe.deal();
-								}
-								players.get(i+1).hand[1]=shoe.deal();
-								if(players.get(i+1).hand[1].getFace()==Card.CUT_CARD){
-									System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-									lastHand=true;
-									players.get(i+1).hand[1]=shoe.deal();
-								}
+								lastHand=players.get(i).addCard(shoe);
+								lastHand=players.get(i+1).addCard(shoe);
 								//transfer bet
 								players.get(i+1).bet=players.get(i).bet;
 								players.get(i).money-=players.get(i).bet;
