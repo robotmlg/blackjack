@@ -52,6 +52,8 @@ public class Player{
 	 */
 	public boolean addCard(Deck d){
 		boolean ret=false;
+		if(index==hand.length)
+			return false;
 		hand[index]=d.deal();
 		if(hand[index].getFace()==Card.CUT_CARD){
 			System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
@@ -70,5 +72,19 @@ public class Player{
 	public void addCard(Card c){
 		hand[index]=c;
 		++index;
+	}
+	/**
+	 * Determines if a hand is a blackjack
+	 *
+	 * @return	true/false Blackjack status
+	 */
+	public boolean hasBJ(){
+		//conditions to fill:
+		//-value is 21
+		//-only 2 cards
+		//-no splits: BJs after splits only count as 21
+		if(this.handTotal()==21 && this.hand[2]==null && this.splits==0)
+			return true;
+		return false;
 	}
 }

@@ -18,7 +18,6 @@ public class Blackjack{
 	 * @param	args[3]	minimum bet
 	 */
 	public static void main(String[] args){
-		int n=0;
 		int winner=0;
 		int nPlayers=0;
 		int nDecks=0;
@@ -30,12 +29,12 @@ public class Blackjack{
 		double ddown=0;
 		char sel=0;
 		boolean play=true;//play again?
-		boolean lastHand=true;//must be true initially to trigger a shuffle
+		boolean bShuffle=true;//must be true initially to trigger a shuffle
+		boolean bCutCard=false;//whether or not the cut card got drawn
 		boolean first=false;//first card of the round for the player
 		boolean softHit=false;
 		ArrayList<Player> players=null;
 		Deck shoe=null;
-
 		//Use a preset gamemode
 		System.out.println("Select a gamemode:");
 		System.out.println("A: Atlantic City\n\t-8 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
@@ -79,7 +78,7 @@ public class Blackjack{
 			}while(nPlayers<1);
 		}
 		//Setup array of players
-		//n+1 for n players and a dealer
+		//nPlayers+1 for n players and a dealer
 		players=new ArrayList<Player>();
 		for(int i=0;i<nPlayers+1;++i)
 			players.add(i,new Player(i));
@@ -150,11 +149,11 @@ public class Blackjack{
 		//game loop
 		do{
 			System.out.println();
-			if(lastHand==true || nDecks==1){
+			if(bShuffle==true || nDecks==1){
 				System.out.printf("Shuffling deck%s...\n",nDecks==1?"":"s");
 				shoe=new Deck(nDecks);
 				shoe.shuffle();
-				lastHand=false;
+				bShuffle=false;
 			}
 			//reset players
 			for(int i=0;i<players.size();++i){
@@ -181,18 +180,18 @@ public class Blackjack{
 			System.out.println("Dealing...");
 			for(int j=0;j<2;++j){
 				for(int i=0;i<players.size() && !shoe.isEmpty();++i){
-					lastHand=players.get(i).addCard(shoe);
+					bCutCard=players.get(i).addCard(shoe);
+					if(bCutCard==true)bShuffle=true;
 				}
 			}
 			if(shoe.isEmpty()){
 				System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
 			}
 			//players loop
-			//Start with index 1, because the dealer (0) goes last
+			//Start with index 1, because the dealer (at index 0) goes last
 			for(int i=1;!shoe.isEmpty() && i<players.size();++i){
-				n=2;
 				first=true;
-				while(players.get(i).handTotal()<21 && players.get(i).stood==false && n<MAX_CARDS){
+				while(players.get(i).handTotal()<21 && players.get(i).stood==false){
 					dispTable(players,true);
 					System.out.printf("\nPlayer %s:  H: Hit  S: Stand  D: Double Down  ",players.get(i).pid);
 					if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue())
@@ -203,7 +202,8 @@ public class Blackjack{
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
-							lastHand=players.get(i).addCard(shoe);
+							bCutCard=players.get(i).addCard(shoe);
+							if(bCutCard==true)bShuffle=true;
 							players.get(i).stood=false;
 							first=false;
 							break;
@@ -228,7 +228,8 @@ public class Blackjack{
 							players.get(i).bet+=ddown;
 							players.get(i).money-=ddown;
 							players.get(i).stood=true;
-							lastHand=players.get(i).addCard(shoe);
+							bCutCard=players.get(i).addCard(shoe);
+							if(bCutCard==true)bShuffle=true;
 							first=false;
 							break;
 						case 'P':
@@ -240,8 +241,10 @@ public class Blackjack{
 								//go back a card in the first hand
 								players.get(i).index--;
 								//deal each a new card
-								lastHand=players.get(i).addCard(shoe);
-								lastHand=players.get(i+1).addCard(shoe);
+								bCutCard=players.get(i).addCard(shoe);
+								if(bCutCard==true)bShuffle=true;
+								bCutCard=players.get(i+1).addCard(shoe);
+								if(bCutCard==true)bShuffle=true;
 								//transfer bet
 								players.get(i+1).bet=players.get(i).bet;
 								players.get(i).money-=players.get(i).bet;
@@ -251,6 +254,7 @@ public class Blackjack{
 								if(players.get(i+1).hand[0].getFace()==Card.ACE){
 									players.get(i).stood=true;
 									players.get(i+1).stood=true;
+									System.out.printf("\nPlayer %d can't hit on split Aces.\n\n");
 								}
 							}
 							else
@@ -289,38 +293,20 @@ public class Blackjack{
 					System.out.println("(He stands on all 17s)");
 				for(int i=2;players.get(DEALER).handTotal()<=17 && i<MAX_CARDS;++i){
 					if(players.get(DEALER).handTotal()==17 && softHit==true){
-							players.get(DEALER).hand[i]=shoe.deal();
+						bCutCard=players.get(DEALER).addCard(shoe);
+						if(bCutCard==true)bShuffle=true;
 					}
 					else if(players.get(DEALER).handTotal()==17)
 						break;
-					players.get(DEALER).hand[i]=shoe.deal();
-					if(players.get(DEALER).hand[i].getFace()==Card.CUT_CARD){
-						System.out.println("\nCUT CARD DRAWN. LAST HAND.\n");
-						lastHand=true;
-						players.get(DEALER).hand[i]=shoe.deal();
-					}
+					bCutCard=players.get(DEALER).addCard(shoe);
+					if(bCutCard==true)bShuffle=true;
 				}
-
-				/*
-				winner=0;
-				for(int i=0;i<players.length;++i){
-					if(handTotal(players[i])<=21 && handTotal(players[i])>=handTotal(players[winner])){
-						winner=i;
-					}
-					else if(handTotal(players[i])>21)
-						winner++;
-				}
-				if(winner==0)
-					System.out.println("Dealer wins!");
-				else
-					System.out.printf("Player %d wins!\n",winner);
-				*/
 				//Calculate winnings
 				dval=players.get(DEALER).handTotal();
 				for(int i=1;i<players.size();++i){
 					pval=players.get(i).handTotal();
 					if(dval>21 && pval<=21){//Dealer bust, player win
-						if(pval==21 && players.get(i).hand[2]==null){
+						if(players.get(i).hasBJ()){
 							players.get(i).money+=2.5*players.get(i).bet;
 							players.get(DEALER).money-=1.5*players.get(i).bet;
 						}
@@ -331,7 +317,7 @@ public class Blackjack{
 					}
 					else if(pval<=21 && dval<=21){//no bust
 						if(pval>dval){//player wins
-							if(pval==21 && players.get(i).hand[2]==null && players.get(i).splits==0){
+							if(players.get(i).hasBJ()){
 								players.get(i).money+=2.5*players.get(i).bet;//Blackjack pays 3:2, except on a split
 								players.get(DEALER).money-=1.5*players.get(i).bet;
 							}
@@ -341,11 +327,13 @@ public class Blackjack{
 							}
 						}
 						else if(pval==dval){//possible push
-							if(pval==21 && players.get(i).hand[2]==null && players.get(DEALER).hand[2]!=null && players.get(i).splits==0){
+							//player has blackjack, dealer just had 21
+							if(players.get(i).hasBJ() && !players.get(DEALER).hasBJ()){
 								players.get(i).money+=2.5*players.get(i).bet;//Blackjack beats other 21s
 								players.get(DEALER).money-=1.5*players.get(i).bet;
 							}
-							else if(dval==21 && players.get(DEALER).hand[2]==null && players.get(i).hand[2]!=null){
+							//dealer had blackjack, player just has 21
+							else if(!players.get(i).hasBJ() && players.get(DEALER).hasBJ()){
 								players.get(DEALER).money+=players.get(i).bet;
 							}
 							else
@@ -370,7 +358,7 @@ public class Blackjack{
 				System.out.print("Play again? ");
 				play=IO.readBoolean();
 			}
-		}while(play);
+		}while(play==true);
 		System.out.println("Thank you for playing Blackjack with us.  Goodbye.");
 	}
 	/**
