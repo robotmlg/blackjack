@@ -193,10 +193,11 @@ public class Blackjack{
 			if(players.get(DEALER).hand[1].getFace()==Card.ACE){
 				dispTable(players,false);
 				System.out.println("\nThe dealer is showing an Ace. Insurance open.");
-				System.out.println("Maximum insurance amount is half of your original bet.\n");
+				System.out.println("Maximum insurance amount is half of your original bet.");
+				System.out.println("Enter 0 for no insurance.\n");
 				for(int i=1;i<players.size();++i){
 					do{
-						System.out.printf("Player %d: Enter insurance amount. Enter 0 for no insurance: $",i);
+						System.out.printf("Player %d: $",i);
 						players.get(i).ins=IO.readDouble();
 						if(players.get(i).ins>players.get(i).bet/2)
 							System.out.printf("Bet must be less than $%03.2f. Re-enter.\n",players.get(i).bet/2);
@@ -235,12 +236,12 @@ public class Blackjack{
 				first=true;
 				while(players.get(i).handTotal()<21 && players.get(i).stood==false){
 					dispTable(players,showHole);
-					System.out.printf("\nPlayer %s:  H: Hit  S: Stand  D: Double Down  ",players.get(i).pid);
+					System.out.printf("\nPlayer %d:  H: Hit  S: Stand  D: Double Down  ",players.get(i).pid);
 					if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].getValue()==players.get(i).hand[1].getValue())
 						System.out.printf("P: Split  ");
 					if(first==true && players.get(i).splits==0)
-						System.out.printf("G: Give-up  ");
-					System.out.printf("A: Ask the Guru  Q: Quit\nChoice: ");
+						System.out.printf("U: Surrender  ");
+					System.out.printf("G: Guru  Q: Quit\nChoice: ");
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
@@ -302,7 +303,7 @@ public class Blackjack{
 							else
 								System.out.println("Invalid choice. Select again.");
 							break;
-						case 'G':
+						case 'U':
 							if(first==true && players.get(i).splits==0){
 								players.get(i).money+=players.get(i).bet/2;
 								players.get(DEALER).money+=players.get(i).bet/2;
@@ -313,8 +314,9 @@ public class Blackjack{
 								System.out.println("Invalid choice. Select again.");
 							first=false;
 							break;
-						case 'A':
-							hint(players.get(i),players.get(DEALER),softHit);
+						case 'G':
+							System.out.println("\nThe Guru thinks you should " +hint(players.get(i),players.get(DEALER),softHit)+".\n");
+
 							break;
 						case 'Q':
 							System.out.println("Goodbye.");
@@ -331,20 +333,25 @@ public class Blackjack{
 			}
 			if(!shoe.isEmpty()){
 				dispTable(players,false);
-				System.out.println("Dealing to dealer...");
+				System.out.print("\nDealing to dealer - ");
 				if(softHit==true)
-					System.out.println("(He hits on soft 17s)");
+					System.out.println("he hits on soft 17s");
 				else
-					System.out.println("(He stands on all 17s)");
-				for(int i=2;players.get(DEALER).handTotal()<=17 && i<MAX_CARDS;++i){
-					if(players.get(DEALER).handTotal()==17 && softHit==true){
+					System.out.println("he stands on all 17s");
+				System.out.println();
+				while(players.get(DEALER).handTotal()<=17){
+					//if you have a soft 17, and the dealer hits on soft 17s, hit
+					if(players.get(DEALER).handTotal()==17 && softHit==true && players.get(DEALER).isSoft()==true){
 						bCutCard=players.get(DEALER).addCard(shoe);
 						if(bCutCard==true)bShuffle=true;
 					}
+					//if you have any kind of 17
 					else if(players.get(DEALER).handTotal()==17)
 						break;
-					bCutCard=players.get(DEALER).addCard(shoe);
-					if(bCutCard==true)bShuffle=true;
+					else{
+						bCutCard=players.get(DEALER).addCard(shoe);
+						if(bCutCard==true)bShuffle=true;
+					}
 				}
 				//Calculate winnings
 				dval=players.get(DEALER).handTotal();
@@ -419,8 +426,9 @@ public class Blackjack{
 		final String ddown="double down";
 		final String hit="hit";
 		final String stand="stand";
-		final String giveup="give up";
+		final String surr="surrender";
 		String ret="";
+		int dval=d.hand[1].getValue();
 		//player has a pair
 		if(p.hand[2]==null && p.hand[0].equalVal(p.hand[1])){
 			switch(p.hand[0].getValue()){
@@ -430,27 +438,27 @@ public class Blackjack{
 					break;
 				case Card.TWO:
 				case Card.THREE:
-					if(d.hand[1].getValue()>=8 || d.hand[1].getValue()==1)ret=hit;
+					if(dval>=8 || dval==1)ret=hit;
 					else ret=split;
 					break;
 				case Card.FOUR:
-					if(d.hand[1].getValue()==5 || d.hand[1].getValue()==6)ret=split;
+					if(dval==5 || dval==6)ret=split;
 					else ret=hit;
 					break;
 				case Card.FIVE:
-					if(d.hand[1].getValue()==10 || d.hand[1].getValue()==1)ret=hit;
+					if(dval==10 || dval==1)ret=hit;
 					else ret=ddown;
 					break;
 				case Card.SIX:
-					if(d.hand[1].getValue()>=7 || d.hand[1].getValue()==1)ret=hit;
+					if(dval>=7 || dval==1)ret=hit;
 					else ret=split;
 					break;
 				case Card.SEVEN:
-					if(d.hand[1].getValue()>=8 || d.hand[1].getValue()==1)ret=hit;
+					if(dval>=8 || dval==1)ret=hit;
 					else ret=split;
 					break;
 				case Card.NINE:
-					if(d.hand[1].getValue()==1 || d.hand[1].getValue()==10 || d.hand[1].getValue()==7)ret=stand;
+					if(dval==1 || dval==10 || dval==7)ret=stand;
 					else ret=split;
 					break;
 				case Card.TEN:
@@ -459,8 +467,79 @@ public class Blackjack{
 			}
 		}
 		//soft hands
-	//	if(p.hand
+		else if(p.isSoft()){
+			switch(p.handTotal()){
+				case 19: case 20:
+					ret=stand;
+					break;
+				case 18:
+					if(dval==2 || dval==7 || dval==8) ret=stand;
+					else if(dval>=3 && dval <=6) ret=ddown;
+					else ret=hit;
+					break;
+				case 17:
+					if(dval>=3 && dval<=6) ret=ddown;
+					else ret=hit;
+					break;
+				case 16: case 15:
+					if(dval>=4 && dval<=6 ret=ddown;
+					else ret=hit;
+					break;
+				case 14: case 13:
+					if(dval==5 || dval==6) ret=ddown;
+					else ret=hit;
+					break;
+				default:
+					ret=hit;
+					break;
+			}
+		}
 		//generic totals
+		else{
+			switch(p.handTotal()){
+				case 17: case 18: case 19: case 20:
+					ret=stand;
+					break;
+				case 16:
+					if(dval>=9 || dval==1) ret=surr;
+					else if(dval<=6) ret=stand;
+					else ret=hit;
+					break;
+				case 15:
+					if(dval<=6 && dval!=1) ret=surr;
+					else if(dval==10) ret=surr;
+					else ret=hit;
+					break;
+				case 13: case 14:
+					if(dval>=7 || dval==1) ret=hit;
+					else ret=stand;
+					break;
+				case 12:
+					if(dval>=7 || dval<=3) ret=hit;
+					else ret=stand;
+					break;
+				case 11:
+					if(dval==1) ret=hit;
+					else ret=ddown;
+					break;
+				case 10:
+					if(dval==1 || dval==10) ret=hit;
+					else ret=ddown;
+					break;
+				case 9:
+					if(dval>=3 && dval<=6) ret=ddown;
+					else ret=hit;
+					break;
+				case 8: case 7: case 6: case 5:
+					ret=hit;
+					break;
+				default:
+					ret=stand;
+					break;
+			}
+		}
+		if(ret.equals(surr) && p.hand[2]!=null)
+			ret=hit;
 		return ret;
 	}
 	/**

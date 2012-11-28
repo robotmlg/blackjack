@@ -30,7 +30,7 @@ public class Player{
 	 *
 	 * @return	the sum of the card values
 	 */
-	public int handTotal(boolean... sh){
+	public int handTotal(){
 		int ret=0;
 		int aces=0;
 		//Calculate with Ace=11
@@ -43,6 +43,31 @@ public class Player{
 		if(ret>21 && aces>0){
 			for(;aces>0 && ret>21;--aces)
 				ret-=10;
+		}
+		return ret;
+	}
+	/**
+	 * Determines whether the hand is "soft" (has an Ace valued 11)
+	 *
+	 * @return	soft or not
+	 */
+	public boolean isSoft(){
+		int val=0;
+		int aces=0;
+		boolean ret=true;
+		//Calculate value with Ace=11
+		for(int i=0;i<hand.length && hand[i]!=null;++i){
+			val+=(hand[i].getValue()==1?11:hand[i].getValue());
+			if(hand[i].getValue()==1)
+				++aces;
+		}
+		//If the hand is a bust, change each Ace to value 1 until the hand is not a bust
+		if(val>21 && aces>0){
+			for(;aces>0 && val>21;--aces)
+				val-=10;
+			//if there are still aces left after un-busting, the hand is softs
+			if(aces==0)
+				ret=false;
 		}
 		return ret;
 	}
