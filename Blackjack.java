@@ -190,8 +190,6 @@ public class Blackjack{
 				System.out.println("\nSHOE EMPTY. RE-SHUFFLING AND DEALING.\n");
 			}
 			//INSURANCE
-			players.get(DEALER).hand[0]=new Card(Card.SPADES,Card.KING);
-			players.get(DEALER).hand[1]=new Card(Card.SPADES,Card.ACE);
 			if(players.get(DEALER).hand[1].getFace()==Card.ACE){
 				dispTable(players,false);
 				System.out.println("\nThe dealer is showing an Ace. Insurance open.");
@@ -242,7 +240,7 @@ public class Blackjack{
 						System.out.printf("P: Split  ");
 					if(first==true && players.get(i).splits==0)
 						System.out.printf("G: Give-up  ");
-					System.out.printf("Q: Quit\nChoice: ");
+					System.out.printf("A: Ask the Guru  Q: Quit\nChoice: ");
 					sel=IO.readChar();
 					switch(Character.toUpperCase(sel)){
 						case 'H':
@@ -314,6 +312,9 @@ public class Blackjack{
 							else
 								System.out.println("Invalid choice. Select again.");
 							first=false;
+							break;
+						case 'A':
+							hint(players.get(i),players.get(DEALER),softHit);
 							break;
 						case 'Q':
 							System.out.println("Goodbye.");
@@ -404,6 +405,63 @@ public class Blackjack{
 			}
 		}while(play==true);
 		System.out.println("Thank you for playing Blackjack with us.  Goodbye.");
+	}
+	/**
+	 * Give a hint as to the best course of action
+	 *
+	 * @param	p	a Player
+	 * @param	d	the Dealer
+	 * @param	h	hits on soft 17s?
+	 * @return	a string of the recommended move
+	 */
+	public static String hint(Player p,Player d,boolean h){
+		final String split="split";
+		final String ddown="double down";
+		final String hit="hit";
+		final String stand="stand";
+		final String giveup="give up";
+		String ret="";
+		//player has a pair
+		if(p.hand[2]==null && p.hand[0].equalVal(p.hand[1])){
+			switch(p.hand[0].getValue()){
+				case Card.ACE:
+				case Card.EIGHT:
+					ret=split;
+					break;
+				case Card.TWO:
+				case Card.THREE:
+					if(d.hand[1].getValue()>=8 || d.hand[1].getValue()==1)ret=hit;
+					else ret=split;
+					break;
+				case Card.FOUR:
+					if(d.hand[1].getValue()==5 || d.hand[1].getValue()==6)ret=split;
+					else ret=hit;
+					break;
+				case Card.FIVE:
+					if(d.hand[1].getValue()==10 || d.hand[1].getValue()==1)ret=hit;
+					else ret=ddown;
+					break;
+				case Card.SIX:
+					if(d.hand[1].getValue()>=7 || d.hand[1].getValue()==1)ret=hit;
+					else ret=split;
+					break;
+				case Card.SEVEN:
+					if(d.hand[1].getValue()>=8 || d.hand[1].getValue()==1)ret=hit;
+					else ret=split;
+					break;
+				case Card.NINE:
+					if(d.hand[1].getValue()==1 || d.hand[1].getValue()==10 || d.hand[1].getValue()==7)ret=stand;
+					else ret=split;
+					break;
+				case Card.TEN:
+					ret=stand;
+					break;
+			}
+		}
+		//soft hands
+	//	if(p.hand
+		//generic totals
+		return ret;
 	}
 	/**
 	 * Displays the cards on the table

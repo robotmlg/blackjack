@@ -30,7 +30,7 @@ public class Player{
 	 *
 	 * @return	the sum of the card values
 	 */
-	public int handTotal(){
+	public int handTotal(boolean... sh){
 		int ret=0;
 		int aces=0;
 		//Calculate with Ace=11
