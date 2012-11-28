@@ -54,20 +54,22 @@ public class Player{
 	public boolean isSoft(){
 		int val=0;
 		int aces=0;
-		boolean ret=true;
+		boolean ret=false;
 		//Calculate value with Ace=11
 		for(int i=0;i<hand.length && hand[i]!=null;++i){
 			val+=(hand[i].getValue()==1?11:hand[i].getValue());
 			if(hand[i].getValue()==1)
 				++aces;
 		}
+		if(aces>0)
+			ret=true;
 		//If the hand is a bust, change each Ace to value 1 until the hand is not a bust
 		if(val>21 && aces>0){
 			for(;aces>0 && val>21;--aces)
 				val-=10;
-			//if there are still aces left after un-busting, the hand is softs
+			//if there are still aces at 11 left after un-busting, the hand is softs
 			if(aces==0)
-				ret=false;
+				ret=true;
 		}
 		return ret;
 	}

@@ -342,6 +342,7 @@ public class Blackjack{
 				while(players.get(DEALER).handTotal()<=17){
 					//if you have a soft 17, and the dealer hits on soft 17s, hit
 					if(players.get(DEALER).handTotal()==17 && softHit==true && players.get(DEALER).isSoft()==true){
+						System.out.println("DEALER SOFT");
 						bCutCard=players.get(DEALER).addCard(shoe);
 						if(bCutCard==true)bShuffle=true;
 					}
@@ -482,7 +483,7 @@ public class Blackjack{
 					else ret=hit;
 					break;
 				case 16: case 15:
-					if(dval>=4 && dval<=6 ret=ddown;
+					if(dval>=4 && dval<=6) ret=ddown;
 					else ret=hit;
 					break;
 				case 14: case 13:
