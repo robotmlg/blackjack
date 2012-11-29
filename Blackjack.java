@@ -297,7 +297,7 @@ public class Blackjack{
 								if(players.get(i+1).hand[0].getFace()==Card.ACE){
 									players.get(i).stood=true;
 									players.get(i+1).stood=true;
-									System.out.printf("\nPlayer %d can't hit on split Aces.\n\n");
+									System.out.printf("\nPlayer %d can't hit on split Aces.\n\n",i);
 								}
 							}
 							else
