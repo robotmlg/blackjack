@@ -84,7 +84,7 @@ public class Player{
 				val-=10;
 			//if there are still aces at 11 left after un-busting, the hand is softs
 			if(aces==0)
-				ret=true;
+				ret=false;
 		}
 		return ret;
 	}
