@@ -422,8 +422,14 @@ public class Blackjack{
 						--i;
 					}
 				}
-				System.out.print("Play again? ");
-				play=IO.readBoolean();
+				if(players.size()==1){
+					System.out.println("All players have been eliminated.  The game is over.");
+					play=false;
+				}
+				else{
+					System.out.print("Play again? ");
+					play=IO.readBoolean();
+				}
 			}
 		}while(play==true);
 		System.out.println("Thank you for playing Blackjack with us.  Goodbye.");
