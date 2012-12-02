@@ -1,5 +1,5 @@
 Compile with
-$javac Blackjack.java
+$javac *.java
 
 Run with
 $java Blackjack
