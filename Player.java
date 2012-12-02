@@ -3,6 +3,8 @@
  * @version	1.0
  * @since	2012-11-16
  */
+import java.util.*;
+
 public class Player{
 	Card[] hand;
 	double bet;//amount of the player's bet
