@@ -26,6 +26,19 @@ public class Player{
 		hand=new Card[11];//maximum 11 cards without busting (do the math)
 	}
 	/**
+	 * Resets variables for a new round
+	 */
+	public void reset(){
+		//Fill the hand with null Cards
+		Arrays.fill(hand,null);
+		//reset split count
+		splits=0;
+		//unstand
+		stood=false;
+		//reset index
+		index=0;
+	}
+	/**
 	 * Calculates the total hand value for the player
 	 *
 	 * @return	the sum of the card values

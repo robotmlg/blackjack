@@ -159,20 +159,13 @@ public class Blackjack{
 			}
 			//reset players
 			for(int i=0;i<players.size();++i){
-				//Fill the players hands with null Cards
-				Arrays.fill(players.get(i).hand,null);
-				//reset split count
-				players.get(i).splits=0;
-				//unstand
-				players.get(i).stood=false;
-				//reset index
-				players.get(i).index=0;
+				players.get(i).reset();
 			}
 			//get bets
 			System.out.println("Place your bets!");
 			for(int i=1;i<players.size();++i){
 				do{
-					System.out.printf("Player %d: ",i);
+					System.out.printf("Player %d: ",players.get(i).pid);
 					players.get(i).bet=IO.readDouble();
 					if(players.get(i).bet<minBet)
 						System.out.printf("Bet must be $%03.2f or more. Re-enter.\n",minBet);
@@ -197,7 +190,7 @@ public class Blackjack{
 				System.out.println("Enter 0 for no insurance.\n");
 				for(int i=1;i<players.size();++i){
 					do{
-						System.out.printf("Player %d: $",i);
+						System.out.printf("Player %d: $",players.get(i).pid);
 						players.get(i).ins=IO.readDouble();
 						if(players.get(i).ins>players.get(i).bet/2)
 							System.out.printf("Bet must be less than $%03.2f. Re-enter.\n",players.get(i).bet/2);
@@ -408,6 +401,13 @@ public class Blackjack{
 					players.get(i).bet=0;
 				System.out.println("FINAL:");
 				dispTable(players,true);
+				for(int i=1;i<players.size();++i){
+					if(players.get(i).money<=0){
+						System.out.printf("\nPlayer %d is out of money.  Removing him...\n",players.get(i).pid);
+						players.remove(i);
+						--i;
+					}
+				}
 				System.out.print("Play again? ");
 				play=IO.readBoolean();
 			}
