@@ -471,10 +471,12 @@ public class Blackjack{
 		else if(p.isSoft()){
 			switch(p.handTotal()){
 				case 19: case 20:
-					ret=stand;
+					if(h==true && dval==6) ret=ddown;
+					else ret=stand;
 					break;
 				case 18:
-					if(dval==2 || dval==7 || dval==8) ret=stand;
+					if(h==true && dval==2) ret=ddown;
+					else if(dval==2 || dval==7 || dval==8) ret=stand;
 					else if(dval>=3 && dval <=6) ret=ddown;
 					else ret=hit;
 					break;
@@ -499,7 +501,8 @@ public class Blackjack{
 		else{
 			switch(p.handTotal()){
 				case 17: case 18: case 19: case 20:
-					ret=stand;
+					if(dval==1 && h==true) ret=surr;
+					else ret=stand;
 					break;
 				case 16:
 					if(dval>=9 || dval==1) ret=surr;
@@ -509,6 +512,7 @@ public class Blackjack{
 				case 15:
 					if(dval<=6 && dval!=1) ret=surr;
 					else if(dval==10) ret=surr;
+					else if(dval==1 && h==true) ret=surr;
 					else ret=hit;
 					break;
 				case 13: case 14:
@@ -520,7 +524,10 @@ public class Blackjack{
 					else ret=stand;
 					break;
 				case 11:
-					if(dval==1) ret=hit;
+					if(dval==1){
+						if(h==true) ret=ddown;
+						 else ret=hit;
+					}
 					else ret=ddown;
 					break;
 				case 10:
