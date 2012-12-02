@@ -41,6 +41,7 @@ public class Blackjack{
 		System.out.println("A: Atlantic City\n\t-8 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
 		System.out.println("L: Vegas Strip\n\t-4 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
 		System.out.println("D: Vegas Downtown\n\t-2 deck shoe\n\t-Resplit to 4\n\t-Dealer hits soft 17s");
+		System.out.println("V: Vegas Single Deck\n\t-1 deck\n\t-Resplit to 2\n\t-Dealer hits soft 17s");
 		System.out.println("E: European\n\t-2 deck shoe\n\t-Resplit to 2\n\t-Dealer stands on all 17s");
 		System.out.print("C: Custom\nChoice: ");
 		do{
@@ -61,6 +62,12 @@ public class Blackjack{
 				case 'D':
 					nDecks=2;
 					maxSplits=2;
+					softHit=true;
+					first=true;
+					break;
+				case 'V':
+					nDecks=1;
+					maxSplits=1;
 					softHit=true;
 					first=true;
 					break;
