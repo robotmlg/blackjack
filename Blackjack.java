@@ -39,7 +39,9 @@ public class Blackjack{
 		//Use a preset gamemode
 		System.out.println("Select a gamemode:");
 		System.out.println("A: Atlantic City\n\t-8 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
-		System.out.println("L: Las Vegas\n\t-4 deck shoe\n\t-Resplit to 4\n\t-Dealer hits soft 17s");
+		System.out.println("L: Vegas Strip\n\t-4 deck shoe\n\t-Resplit to 4\n\t-Dealer stands on all 17s");
+		System.out.println("D: Vegas Downtown\n\t-2 deck shoe\n\t-Resplit to 4\n\t-Dealer hits soft 17s");
+		System.out.println("E: European\n\t-2 deck shoe\n\t-Resplit to 2\n\t-Dealer stands on all 17s");
 		System.out.print("C: Custom\nChoice: ");
 		do{
 			sel=IO.readChar();
@@ -54,6 +56,18 @@ public class Blackjack{
 					nDecks=4;
 					maxSplits=2;
 					softHit=true;
+					first=true;
+					break;
+				case 'D':
+					nDecks=2;
+					maxSplits=2;
+					softHit=true;
+					first=true;
+					break;
+				case 'E':
+					nDecks=2;
+					maxSplits=1;
+					softHit=false;
 					first=true;
 					break;
 				case 'C':
