@@ -190,7 +190,9 @@ public class Blackjack{
 					players.get(i).bet=IO.readDouble();
 					if(players.get(i).bet<minBet)
 						System.out.printf("Bet must be $%03.2f or more. Re-enter.\n",minBet);
-				}while(players.get(i).bet<minBet);
+					if(players.get(i).bet>players.get(i).money)
+						System.out.printf("You cannot bet more than the amount of money you have. Re-enter.\n");
+				}while(players.get(i).bet<minBet || players.get(i).bet>players.get(i).money);
 				players.get(i).money-=players.get(i).bet;
 			}
 			System.out.println("Dealing...");
@@ -217,7 +219,9 @@ public class Blackjack{
 							System.out.printf("Bet must be less than $%03.2f. Re-enter.\n",players.get(i).bet/2);
 						else if(players.get(i).ins<0)
 							System.out.printf("Bet must be larger than 0. Re-enter.\n");
-					}while(players.get(i).ins<0 || players.get(i).ins>players.get(i).bet/2);
+						if(players.get(i).ins>players.get(i).money)
+							System.out.printf("You cannot bet more than the amount of money you have. Re-enter.\n");
+					}while(players.get(i).ins<0 || players.get(i).ins>players.get(i).bet/2 || players.get(i).ins>players.get(i).money);
 					players.get(i).money-=players.get(i).ins;
 					if(players.get(i).ins>0)showHole=true;
 				}
@@ -281,7 +285,10 @@ public class Blackjack{
 									System.out.print("Bet cannot be negative.\n");
 									System.out.print("Re-e");
 								}
-							}while(ddown>players.get(i).bet || ddown<=0);
+								else if(ddown>players.get(players.get(i).pid).money){
+									System.out.printf("You cannot bet more than the amount of money you have.\nRe-");
+								}
+							}while(ddown>players.get(i).bet || ddown<=0 || ddown>players.get(players.get(i).pid).money);
 							players.get(i).bet+=ddown;
 							players.get(i).money-=ddown;
 							players.get(i).stood=true;
@@ -290,6 +297,10 @@ public class Blackjack{
 							first=false;
 							break;
 						case 'P':
+							if(players.get(i).money<players.get(i).bet){
+								System.out.println("\nYou do not have enough money to split\n");
+								break;
+							}
 							if(players.get(i).splits<maxSplits && first==true && players.get(i).hand[0].equalVal(players.get(i).hand[1])){
 								//make a second Player, but with the same pid
 								players.add(i+1,new Player(players.get(i).pid));
